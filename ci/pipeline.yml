@@ -1,0 +1,33 @@
+---
+resources:
+  - name: selenium-firefox-docker-image
+    type: docker-image
+    source:
+      repository: selenium/standalone-firefox
+  - name: docker-selenium-jdk-firefox-docker-image
+    type: docker-image
+    source:
+      repository: making/docker-selenium-jdk-firefox
+      username: {{docker-username}}
+      password: {{docker-password}}  
+      email: {{docker-email}}  
+  - name: docker-selenium-jdk-github
+    type: git
+    source:
+      uri: https://github.com/making/docker-selenium-jdk
+      branch: master
+jobs:
+- name: build-ship-it
+  serial: true
+  public: true
+  plan:
+  - aggregate:
+    - get: selenium-firefox-docker-image
+      trigger: true
+      params:
+        skip_download: true
+    - get: docker-selenium-jdk-github
+      trigger: true
+  - put: docker-selenium-jdk-firefox-docker-image
+    params:
+      build: docker-selenium-jdk-github/firefox
